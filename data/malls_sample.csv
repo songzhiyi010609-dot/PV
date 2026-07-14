@@ -1,0 +1,6 @@
+﻿mall_id,name,province,city,lat,lon,image_path,demo_label_has_pv,note
+mall_001,示例商场A,上海,上海,31.2304,121.4737,data/images/mall_001.png,True,large rooftop PV
+mall_002,示例商场B,江苏,苏州,31.2989,120.5853,data/images/mall_002.png,False,plain roof
+mall_003,示例商场C,广东,深圳,22.5431,114.0579,data/images/mall_003.png,True,parking canopy PV
+mall_004,示例商场D,四川,成都,30.5728,104.0668,data/images/mall_004.png,False,blue skylight distractor
+mall_005,示例商场E,浙江,杭州,30.2741,120.1551,data/images/mall_005.png,True,small rooftop PV

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}登录 - 商场中心复核{% endblock %}
+{% block content %}
+<section class="login-panel">
+  <h1>登录</h1>
+  {% if error %}
+    <div class="alert">{{ error }}</div>
+  {% endif %}
+  {% if users_created or setup_needed %}
+    <div class="notice">
+      <p>请先打开用户配置文件，修改示例账号密码后再登录。</p>
+      <code>{{ users_path }}</code>
+    </div>
+  {% endif %}
+  <form method="post" action="/login" class="login-form">
+    <label>
+      账号
+      <input name="username" autocomplete="username" required>
+    </label>
+    <label>
+      密码
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit">登录</button>
+  </form>
+</section>
+{% endblock %}

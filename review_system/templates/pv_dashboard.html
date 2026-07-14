@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}光伏复核{% endblock %}
+{% block content %}
+<section class="stats-grid">
+  <div><b>{{ stats.total }}</b><span>人工 A 导入</span></div>
+  <div><b>{{ stats.pending }}</b><span>待光伏复核</span></div>
+  <div><b>{{ stats.reviewed }}</b><span>已光伏复核</span></div>
+  <div><b>{{ stats.with_image }}</b><span>有证据图</span></div>
+  <div><b>{{ stats.missing_image }}</b><span>缺少证据图</span></div>
+</section>
+
+<section class="toolbar">
+  <form class="province-filter" method="get" action="/pv">
+    <input type="hidden" name="view" value="{{ view }}">
+    <label>
+      省份
+      <select name="province" onchange="this.form.submit()">
+        <option value="" {% if not province_filter %}selected{% endif %}>全部省份</option>
+        {% for province in provinces %}
+          <option value="{{ province }}" {% if province_filter == province %}selected{% endif %}>{{ province }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+  <a class="{% if view == 'pending' %}active{% endif %}" href="/pv?view=pending{% if province_filter %}&province={{ province_filter }}{% endif %}">待复核</a>
+  <a class="{% if view == 'reviewed' %}active{% endif %}" href="/pv?view=reviewed{% if province_filter %}&province={{ province_filter }}{% endif %}">已复核</a>
+  <a class="{% if view == 'with_image' %}active{% endif %}" href="/pv?view=with_image{% if province_filter %}&province={{ province_filter }}{% endif %}">有图</a>
+  <a class="{% if view == 'missing_image' %}active{% endif %}" href="/pv?view=missing_image{% if province_filter %}&province={{ province_filter }}{% endif %}">缺图</a>
+  <a class="{% if view == 'all' %}active{% endif %}" href="/pv?view=all{% if province_filter %}&province={{ province_filter }}{% endif %}">全部</a>
+</section>
+
+<section class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th class="col-province">省份</th>
+        <th>商场</th>
+        <th>影像</th>
+        <th>光伏判断</th>
+        <th>屋顶潜力</th>
+        <th>人工结论</th>
+        <th>POI A 时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.mall_id }}</td>
+        <td class="col-province">{{ row.province }}</td>
+        <td>{{ row.name }}</td>
+        <td>
+          {% if row.full_annotated_path %}
+            <span class="badge level-A">有图</span>
+          {% else %}
+            <span class="badge level-D">缺图</span>
+          {% endif %}
+          <div class="muted">{{ row.image_status }}</div>
+        </td>
+        <td>
+          {{ row.pv_status or "-" }}
+          {% if row.pv_confidence is not none %}<div class="muted">conf {{ "%.3f"|format(row.pv_confidence) }}</div>{% endif %}
+        </td>
+        <td>
+          {{ row.install_condition_level or "-" }}
+          {% if row.roof_area_m2_est is not none %}<div class="muted">{{ "%.0f"|format(row.roof_area_m2_est) }} m²</div>{% endif %}
+        </td>
+        <td>{% if row.decision %}<span class="badge">{{ row.decision }}</span>{% else %}-{% endif %}</td>
+        <td>{{ row.poi_reviewed_at or "-" }}</td>
+        <td><a class="button small" href="/pv/review/{{ row.mall_id }}{% if province_filter %}?province={{ province_filter }}{% endif %}">光伏复核</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

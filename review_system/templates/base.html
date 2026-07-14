@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}商场中心复核{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/app.css?v=20260714_pv_review_tabs">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark">PV</span>
+      <span class="brand-text">商场中心复核</span>
+    </a>
+    {% if user %}
+      <nav class="top-tabs">
+        <a class="top-tab {% if not request.url.path.startswith('/pv') %}active{% endif %}" href="/">商场POI中心复核</a>
+        <a class="top-tab {% if request.url.path.startswith('/pv') %}active{% endif %}" href="/pv">光伏复核</a>
+      </nav>
+      <nav class="topnav">
+        <span class="user">{{ user }}</span>
+        <a class="nav-link nav-logout" href="/logout">退出</a>
+      </nav>
+    {% endif %}
+  </header>
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

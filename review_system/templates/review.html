@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block title %}复核 {{ mall.name }}{% endblock %}
+{% block content %}
+<section class="review-layout review-layout-three">
+  <aside class="side-panel">
+    <h1>{{ mall.name }}</h1>
+    <div class="review-nav">
+      <a class="button nav-back" href="/?view=pending{% if province_filter %}&province={{ province_filter }}{% endif %}">返回复核列表</a>
+      <a class="button secondary" href="/?view=queue{% if province_filter %}&province={{ province_filter }}{% endif %}">查看全部队列</a>
+    </div>
+    <dl class="meta">
+      <dt>ID</dt><dd>{{ mall.mall_id }}</dd>
+      <dt>省份</dt><dd>{{ mall.province }}</dd>
+      <dt>城市</dt><dd>{{ mall.city }}</dd>
+      <dt>原等级</dt><dd><span class="badge">{{ mall.confidence_level }}</span></dd>
+      {% if previous_review and previous_review.decision_level %}
+      <dt>上一轮人工等级</dt><dd><span class="badge level-{{ previous_review.decision_level }}">{{ previous_review.decision_level }}</span></dd>
+      {% endif %}
+      <dt>状态</dt><dd>{{ mall.identity_status }}</dd>
+      <dt>候选 POI</dt><dd>{{ mall.selected_poi_name }}</dd>
+      <dt>地址</dt><dd>{{ mall.selected_address }}</dd>
+      <dt>类型</dt><dd>{{ mall.selected_poi_type }}</dd>
+      <dt>坐标证据</dt><dd>{{ mall.official_coord_evidence }}</dd>
+      <dt>复核原因</dt><dd>{{ mall.suspicious_reason }}</dd>
+    </dl>
+
+    <div class="map-links">
+      {% if mall.selected_lon_wgs84 and mall.selected_lat_wgs84 %}
+        <a target="_blank" href="https://uri.amap.com/marker?position={{ mall.selected_lon_wgs84 }},{{ mall.selected_lat_wgs84 }}&name={{ mall.name }}">高德</a>
+        <a target="_blank" href="https://apis.map.qq.com/uri/v1/marker?marker=coord:{{ mall.selected_lat_wgs84 }},{{ mall.selected_lon_wgs84 }};title:{{ mall.name }}">腾讯</a>
+        <a target="_blank" href="https://api.map.baidu.com/marker?location={{ mall.selected_lat_wgs84 }},{{ mall.selected_lon_wgs84 }}&title={{ mall.name }}&output=html">百度</a>
+      {% endif %}
+    </div>
+
+    <form method="post" action="/review/{{ mall.mall_id }}" class="review-form">
+      <input type="hidden" name="province" value="{{ province_filter }}">
+      <label>
+        人工等级
+        <select name="decision_level" required>
+          {% for level in config.review.decision_levels %}
+            <option value="{{ level }}" {% if review and review.decision_level == level %}selected{% elif not review and previous_review and previous_review.decision_level == level %}selected{% elif not review and not previous_review and level == config.review.default_decision_level %}selected{% endif %}>{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="coord-grid">
+        <label>
+          最终 lon
+          <input id="final_lon" name="final_lon" value="{% if review and review.final_lon %}{{ review.final_lon }}{% elif mall.selected_lon_wgs84 %}{{ mall.selected_lon_wgs84 }}{% endif %}" placeholder="121.xxxxxxxx">
+        </label>
+        <label>
+          最终 lat
+          <input id="final_lat" name="final_lat" value="{% if review and review.final_lat %}{{ review.final_lat }}{% elif mall.selected_lat_wgs84 %}{{ mall.selected_lat_wgs84 }}{% endif %}" placeholder="31.xxxxxxxx">
+        </label>
+      </div>
+      <input id="final_polygon_geojson" name="final_polygon_geojson" type="hidden" value="{% if review and review.final_polygon_geojson %}{{ review.final_polygon_geojson }}{% endif %}">
+      <label>
+        原因
+        <select name="reason">
+          <option value="">未选择</option>
+          {% for item in config.review.reasons %}
+            <option value="{{ item }}" {% if review and review.reason == item %}selected{% endif %}>{{ item }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        备注
+        <textarea name="notes" rows="4">{% if review %}{{ review.notes }}{% endif %}</textarea>
+      </label>
+      <button type="submit">保存并跳到下一条</button>
+      {% if prev_id %}
+        <a class="button secondary" href="/review/{{ prev_id }}{% if province_filter %}?province={{ province_filter }}{% endif %}">上一张</a>
+      {% endif %}
+      {% if next_id %}
+        <a class="button secondary" href="/review/{{ next_id }}{% if province_filter %}?province={{ province_filter }}{% endif %}">跳过</a>
+      {% endif %}
+    </form>
+
+  </aside>
+
+  <section class="main-panel image-panel">
+    <div class="image-tools">
+      <button type="button" id="point-mode" class="tool active">点选中心</button>
+      <button type="button" id="polygon-mode" class="tool">画多边形</button>
+      <button type="button" id="clear-polygon" class="tool secondary">清除多边形</button>
+      <button type="button" id="show-all-markers" class="tool secondary">显示全部点</button>
+    </div>
+    <div
+      id="satellite-picker"
+      class="satellite-picker"
+      data-center-lon="{{ image_mall.selected_lon_wgs84 }}"
+      data-center-lat="{{ image_mall.selected_lat_wgs84 }}"
+      data-zoom="{{ config.imagery.zoom }}"
+      data-size="{{ config.imagery.crop_size_px }}"
+      data-existing-polygon="{% if review and review.final_polygon_geojson %}{{ review.final_polygon_geojson|e }}{% endif %}"
+    >
+      {% if crop_available %}
+        <img id="satellite-image" src="/satellite/{{ mall.mall_id }}" alt="候选中心卫星图">
+        <svg id="polygon-layer" class="polygon-layer" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <polygon id="review-polygon" points=""></polygon>
+          <polyline id="review-polyline" points=""></polyline>
+          <g id="polygon-vertices"></g>
+        </svg>
+        <div class="marker selected" style="left:50%;top:50%;" title="{% if image_center_is_fallback %}候选点看图中心{% else %}当前候选中心{% endif %}"></div>
+        {% for marker in markers %}
+          <button
+            type="button"
+            class="marker provider provider-{{ marker.provider }}"
+            style="left:{{ marker.x_pct }}%;top:{{ marker.y_pct }}%;"
+            data-lon="{{ marker.wgs84_lon }}"
+            data-lat="{{ marker.wgs84_lat }}"
+            data-provider="{{ marker.provider }}"
+            data-rank="{{ marker.rank }}"
+            data-poi-name="{{ marker.poi_name|e }}"
+            data-address="{{ marker.address|e }}"
+            data-poi-type="{{ marker.poi_type|e }}"
+            data-score="{{ marker.identity_score }}"
+            data-flags="{{ marker.flags|e }}"
+            title="{{ marker.provider }} #{{ marker.rank }} {{ marker.poi_name }}"
+          >{{ marker.provider[0:1]|upper }}</button>
+        {% endfor %}
+        <div id="manual-marker" class="marker manual" hidden></div>
+        <div id="detail-focus-marker" class="marker detail-focus" hidden></div>
+      {% else %}
+        <div class="empty-image">缺少可用坐标，无法生成卫星图</div>
+      {% endif %}
+    </div>
+    {% if image_center_is_fallback %}
+      <p class="hint warning">当前记录没有已选中心坐标，卫星图临时使用候选 POI 坐标居中；最终坐标仍需人工点选或点击候选表里的“选用”。</p>
+    {% endif %}
+    <p class="hint">点选中心：点击卫星图写入最终坐标。画多边形：依次点击商场主体边界，系统会自动用多边形中心写入 lon/lat，并保存 polygon。</p>
+    <section class="online-map-panel">
+      <div class="image-tools">
+        <button type="button" id="load-online-map" class="tool secondary">加载在线地图选点</button>
+        <button type="button" id="sync-online-map" class="tool secondary">用当前坐标定位</button>
+      </div>
+      <div
+        id="online-map"
+        class="online-map"
+        data-center-lon="{% if image_mall.selected_lon_wgs84 %}{{ image_mall.selected_lon_wgs84 }}{% elif review and review.final_lon %}{{ review.final_lon }}{% endif %}"
+        data-center-lat="{% if image_mall.selected_lat_wgs84 %}{{ image_mall.selected_lat_wgs84 }}{% elif review and review.final_lat %}{{ review.final_lat }}{% endif %}"
+      >
+        <div class="empty-image">在线地图兜底：卫星图缺失、模糊、偏移时，点击地图写入最终 lon/lat。</div>
+      </div>
+      <p class="hint warning">二次复核目标：B/C/D 记录请尽量通过地图或卫星图选定商场主体中心，并改为 A；确实无法确认才保留 C/D。</p>
+    </section>
+
+  </section>
+
+  <aside class="right-panel">
+    <section class="poi-detail-panel">
+      <h2>点详情</h2>
+      <div id="poi-detail-empty" class="muted">点击卫星图里的 A/T/B 标记，或候选表里的“查看”，这里会显示该点解释。</div>
+      <dl id="poi-detail" class="meta poi-detail" hidden>
+        <dt>来源</dt><dd data-field="provider"></dd>
+        <dt>Rank</dt><dd data-field="rank"></dd>
+        <dt>名称</dt><dd data-field="poi_name"></dd>
+        <dt>地址</dt><dd data-field="address"></dd>
+        <dt>类型</dt><dd data-field="poi_type"></dd>
+        <dt>坐标</dt><dd data-field="coord"></dd>
+        <dt>分数</dt><dd data-field="score"></dd>
+        <dt>风险标记</dt><dd data-field="flags"></dd>
+      </dl>
+      <button type="button" id="use-detail-point" class="button small" hidden>使用这个点</button>
+    </section>
+
+    <div class="candidate-table candidate-table-compact">
+      <h2>官方 POI 候选</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>源</th>
+            <th>Rank</th>
+            <th>名称</th>
+            <th>类型</th>
+            <th>选点</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for item in candidates %}
+          <tr>
+            <td>{{ item.provider }}</td>
+            <td>{{ item.rank }}</td>
+            <td>{{ item.poi_name }}</td>
+            <td>{{ item.poi_type }}</td>
+            <td>
+              {% if item.wgs84_lon and item.wgs84_lat %}
+                <button
+                  type="button"
+                  class="show-candidate"
+                  data-lon="{{ item.wgs84_lon }}"
+                  data-lat="{{ item.wgs84_lat }}"
+                  data-provider="{{ item.provider }}"
+                  data-rank="{{ item.rank }}"
+                  data-poi-name="{{ item.poi_name|e }}"
+                  data-address="{{ item.address|e }}"
+                  data-poi-type="{{ item.poi_type|e }}"
+                  data-score="{{ item.identity_score }}"
+                  data-flags="{{ item.flags|e }}"
+                >查看</button>
+                <button
+                  type="button"
+                  class="pick-candidate"
+                  data-lon="{{ item.wgs84_lon }}"
+                  data-lat="{{ item.wgs84_lat }}"
+                  data-provider="{{ item.provider }}"
+                  data-rank="{{ item.rank }}"
+                  data-poi-name="{{ item.poi_name|e }}"
+                  data-address="{{ item.address|e }}"
+                  data-poi-type="{{ item.poi_type|e }}"
+                  data-score="{{ item.identity_score }}"
+                  data-flags="{{ item.flags|e }}"
+                >选用</button>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </aside>
+</section>
+<script src="/static/js/review.js?v=20260713_second_review_map_picker"></script>
+{% endblock %}

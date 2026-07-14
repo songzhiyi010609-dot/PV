@@ -1,0 +1,12 @@
+{
+  "users": {
+    "admin": {
+      "password": "123456",
+      "display_name": "管理员"
+    },
+    "reviewer1": {
+      "password": "123456",
+      "display_name": "复核员1"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+# PV satellite / rooftop photovoltaic recognition experiment.
+#
+# Base dependencies:
+#   C:\PV\PV\Scripts\python.exe -m pip install -r C:\PV\requirements-pv-gpu.txt
+#
+# GPU PyTorch is installed separately from the PyTorch CUDA wheel index:
+#   C:\PV\PV\Scripts\python.exe -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+
+numpy>=1.26,<3
+pandas>=2.2,<3
+opencv-python>=4.9,<5
+Pillow>=10,<13
+matplotlib>=3.8,<4
+tabulate>=0.9,<1
+requests>=2.31,<3
+huggingface_hub>=1.5,<2
+tqdm>=4.66,<5
+transformers>=5.13,<6
+open_clip_torch>=3.3,<4

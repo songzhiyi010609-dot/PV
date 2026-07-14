@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}光伏复核 {{ item.name }}{% endblock %}
+{% block content %}
+<section class="review-layout pv-review-layout">
+  <aside class="side-panel">
+    <h1>{{ item.name }}</h1>
+    <div class="review-nav">
+      <a class="button nav-back" href="/pv?view=pending{% if province_filter %}&province={{ province_filter }}{% endif %}">返回光伏列表</a>
+      <a class="button secondary" href="/pv?view=all{% if province_filter %}&province={{ province_filter }}{% endif %}">查看全部</a>
+    </div>
+    <dl class="meta">
+      <dt>ID</dt><dd>{{ item.mall_id }}</dd>
+      <dt>省份</dt><dd>{{ item.province }}</dd>
+      <dt>城市</dt><dd>{{ item.city }}</dd>
+      <dt>中心坐标</dt><dd>{{ item.center_lon }}, {{ item.center_lat }}</dd>
+      <dt>POI 复核人</dt><dd>{{ item.poi_reviewer }}</dd>
+      <dt>POI A 时间</dt><dd>{{ item.poi_reviewed_at }}</dd>
+      <dt>PV 路线</dt><dd>{{ item.pv_run_id or "未匹配" }}</dd>
+      <dt>影像状态</dt><dd>{{ item.image_status }}</dd>
+      <dt>算法光伏</dt><dd>{{ item.pv_status or "-" }}{% if item.pv_confidence is not none %} / {{ "%.3f"|format(item.pv_confidence) }}{% endif %}</dd>
+      <dt>潜力等级</dt><dd>{{ item.install_condition_level or "-" }}</dd>
+      <dt>屋顶候选</dt><dd>{{ item.roof_candidate_count or 0 }} 个{% if item.roof_area_m2_est is not none %} / {{ "%.0f"|format(item.roof_area_m2_est) }} m²{% endif %}</dd>
+    </dl>
+
+    <form method="post" action="/pv/review/{{ item.mall_id }}" class="review-form">
+      <input type="hidden" name="province" value="{{ province_filter }}">
+      <label>
+        光伏复核结论
+        <select name="decision" required>
+          {% for decision in config.pv_review.decisions %}
+            <option value="{{ decision }}" {% if review and review.decision == decision %}selected{% elif not review and decision == config.pv_review.default_decision %}selected{% endif %}>{{ decision }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        修正光伏状态
+        <select name="corrected_pv_status">
+          {% for status in config.pv_review.pv_status_options %}
+            <option value="{{ status }}" {% if review and review.corrected_pv_status == status %}selected{% endif %}>{{ status }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        修正潜力等级
+        <select name="corrected_potential_level">
+          {% for level in config.pv_review.potential_level_options %}
+            <option value="{{ level }}" {% if review and review.corrected_potential_level == level %}selected{% endif %}>{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        原因
+        <input name="reason" value="{% if review %}{{ review.reason }}{% endif %}" placeholder="例如：体育场误判为屋顶 / 黄色边界外溢">
+      </label>
+      <label>
+        备注
+        <textarea name="notes" rows="5">{% if review %}{{ review.notes }}{% endif %}</textarea>
+      </label>
+      <button type="submit">保存并跳到下一条</button>
+      {% if prev_id %}
+        <a class="button secondary" href="/pv/review/{{ prev_id }}{% if province_filter %}?province={{ province_filter }}{% endif %}">上一张</a>
+      {% endif %}
+      {% if next_id %}
+        <a class="button secondary" href="/pv/review/{{ next_id }}{% if province_filter %}?province={{ province_filter }}{% endif %}">跳过</a>
+      {% endif %}
+    </form>
+  </aside>
+
+  <section class="main-panel pv-image-panel">
+    <div class="pv-image-tools">
+      {% if item.full_annotated_path %}<a class="button small" target="_blank" href="/pv/image/{{ item.mall_id }}/annotated">标注图</a>{% endif %}
+      {% if item.full_roof_overlay_path %}<a class="button small secondary" target="_blank" href="/pv/image/{{ item.mall_id }}/roof">屋顶层</a>{% endif %}
+      {% if item.full_pv_overlay_path %}<a class="button small secondary" target="_blank" href="/pv/image/{{ item.mall_id }}/pv">光伏层</a>{% endif %}
+      {% if item.full_raw_path %}<a class="button small secondary" target="_blank" href="/pv/image/{{ item.mall_id }}/raw">原图</a>{% endif %}
+      {% if item.review_mosaic_path %}<a class="button small secondary" target="_blank" href="/pv/image/{{ item.mall_id }}/mosaic">拼图</a>{% endif %}
+    </div>
+    <div class="pv-evidence-frame">
+      {% if item.full_annotated_path %}
+        <img src="/pv/image/{{ item.mall_id }}/annotated" alt="光伏复核证据图">
+      {% elif item.review_mosaic_path %}
+        <img src="/pv/image/{{ item.mall_id }}/mosaic" alt="光伏复核拼图">
+      {% else %}
+        <div class="empty-image">没有匹配到光伏证据图。可先标记“影像缺失/异常”，后续重跑 PV 路线后会自动补图。</div>
+      {% endif %}
+    </div>
+    <p class="hint warning">当前光伏复核只导入“人工 POI 等级 A”的商场；不写回 POI 复核结果，避免影响中心点复核。</p>
+  </section>
+</section>
+{% endblock %}

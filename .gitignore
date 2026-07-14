@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+PV/
+.venv/
+.idea/
+outputs/
+handoff_packages/
+satellite_experiment/tile_cache/
+nul*
+*.safetensors
+config/api_keys.local.json
+review_system/config/users.local.json
+data/images/*.png
+data/images/*.jpg
+data/images/*.jpeg
+data/images/*.tif
+data/images/*.tiff

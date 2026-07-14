@@ -1,0 +1,10 @@
+{
+  "dataset_root": "C:\\PV\\datasets\\shanghai_malls_satellite",
+  "source_index": "C:\\PV\\datasets\\shanghai_malls_satellite\\data\\shanghai_imagery_index.csv",
+  "quality_assessment_csv": "C:\\PV\\outputs\\experiments\\20260708_shanghai_mall_quality_pv\\01_dataset_quality\\shanghai_dataset_quality_assessment.csv",
+  "curated_pass_index": "C:\\PV\\datasets\\shanghai_malls_satellite\\curated_v1\\shanghai_curated_pass_index.csv",
+  "review_needed_index": "C:\\PV\\datasets\\shanghai_malls_satellite\\curated_v1\\shanghai_review_needed_index.csv",
+  "rejected_index": "C:\\PV\\datasets\\shanghai_malls_satellite\\curated_v1\\shanghai_rejected_index.csv",
+  "non_destructive": true,
+  "image_copy_policy": "No image files are moved, overwritten, or deleted."
+}

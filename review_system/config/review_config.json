@@ -1,0 +1,118 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8787,
+    "reload": false
+  },
+  "auth": {
+    "users_file": "C:/PV/review_system/config/users.local.json",
+    "session_cookie_name": "pv_review_session",
+    "session_ttl_hours": 12
+  },
+  "paths": {
+    "project_root": "C:/PV",
+    "output_root": "C:/PV/outputs/review/mall_center_review",
+    "database": "C:/PV/outputs/review/mall_center_review/review.db",
+    "review_queue_csv": "C:/PV/outputs/review/mall_center_review/review_queue.csv",
+    "review_results_csv": "C:/PV/outputs/review/mall_center_review/review_results.csv",
+    "approved_centers_csv": "C:/PV/outputs/review/mall_center_review/mall_center_review_approved.csv",
+    "pv_review_results_csv": "C:/PV/outputs/review/mall_center_review/pv_review_results.csv",
+    "summary_markdown": "C:/PV/outputs/review/mall_center_review/review_summary.md",
+    "experiment_output_root": "C:/PV/outputs/experiments/mall_center_review_all",
+    "satellite_crop_dir": "C:/PV/outputs/review/mall_center_review/satellite_crops",
+    "tile_cache_dir": "C:/PV/outputs/review/mall_center_review/tile_cache/esri_world_imagery",
+    "input_result_files": [
+      "C:/PV/outputs/experiments/poi_completed_100/completed_mall_poi_results_100.csv",
+      "C:/PV/outputs/experiments/poi_remaining_after100/data/mall_center_resolved.csv",
+      "C:/PV/outputs/experiments/poi_validate_zhejiang/20260713_zhejiang_full/data/mall_center_resolved.csv"
+    ]
+  },
+  "imagery": {
+    "provider": "esri_world_imagery",
+    "zoom": 18,
+    "crop_size_px": 1536,
+    "timeout_seconds": 30,
+    "jpeg_quality": 94,
+    "marker_visible_margin_px": 120
+  },
+  "review": {
+    "include_confidence_levels": [
+      "C"
+    ],
+    "suspicious_keywords": [
+      "入口",
+      "出口",
+      "停车场",
+      "服务台",
+      "办公区",
+      "展厅",
+      "南门",
+      "北门",
+      "东门",
+      "西门",
+      "营地",
+      "地铁",
+      "公交",
+      "项目",
+      "地块"
+    ],
+    "decision_levels": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "default_decision_level": "C",
+    "reasons": [
+      "确认商场主体中心",
+      "坐标修正后通过",
+      "入口/门点不是中心",
+      "停车场/内部店铺误匹配",
+      "项目地块/建设中",
+      "办公区/展厅误匹配",
+      "多源坐标不一致",
+      "影像不清楚",
+      "不是商场",
+      "不在上海",
+      "暂缓"
+    ],
+    "second_review_enabled": true,
+    "second_review_levels": [
+      "B",
+      "C",
+      "D"
+    ]
+  },
+  "online_map": {
+    "enabled": true,
+    "provider": "amap",
+    "amap_key": "",
+    "default_zoom": 18
+  },
+  "pv_review": {
+    "source_run_dir": "C:/PV/outputs/experiments/mall_pv_potential_screening/20260713_shanghai_A_bdappv_singlemap_v2",
+    "decisions": [
+      "通过",
+      "光伏误检",
+      "潜力屋顶误检",
+      "边界需修正",
+      "影像缺失/异常",
+      "暂缓"
+    ],
+    "default_decision": "通过",
+    "pv_status_options": [
+      "沿用算法",
+      "有光伏",
+      "无明显光伏",
+      "不确定"
+    ],
+    "potential_level_options": [
+      "沿用算法",
+      "高",
+      "中",
+      "低",
+      "无",
+      "不确定"
+    ]
+  }
+}

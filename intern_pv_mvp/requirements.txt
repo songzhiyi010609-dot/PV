@@ -1,0 +1,6 @@
+numpy>=1.26,<3
+pandas>=2.2,<3
+opencv-python>=4.9,<5
+Pillow>=10,<13
+requests>=2.31,<3
+tqdm>=4.66,<5

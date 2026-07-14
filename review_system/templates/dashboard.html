@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}复核队列{% endblock %}
+{% block content %}
+<section class="stats-grid">
+  <div><b>{{ stats.total }}</b><span>总记录</span></div>
+  <div><b>{{ stats.queue }}</b><span>复核队列</span></div>
+  <div><b>{{ stats.pending }}</b><span>待复核</span></div>
+  <div><b>{{ stats.reviewed }}</b><span>已复核</span></div>
+  <div><b>{{ stats.approved }}</b><span>可进入 1km</span></div>
+</section>
+
+<section class="toolbar">
+  <form class="province-filter" method="get" action="/">
+    <input type="hidden" name="view" value="{{ view }}">
+    <label>
+      省份
+      <select name="province" onchange="this.form.submit()">
+        <option value="" {% if not province_filter %}selected{% endif %}>全部省份</option>
+        {% for province in provinces %}
+          <option value="{{ province }}" {% if province_filter == province %}selected{% endif %}>{{ province }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+  <a class="{% if view == 'pending' %}active{% endif %}" href="/?view=pending{% if province_filter %}&province={{ province_filter }}{% endif %}">待复核</a>
+  <a class="{% if view == 'reviewed' %}active{% endif %}" href="/?view=reviewed{% if province_filter %}&province={{ province_filter }}{% endif %}">已复核</a>
+  <a class="{% if view == 'queue' %}active{% endif %}" href="/?view=queue{% if province_filter %}&province={{ province_filter }}{% endif %}">复核队列</a>
+  <a class="{% if view == 'all' %}active{% endif %}" href="/?view=all{% if province_filter %}&province={{ province_filter }}{% endif %}">全部</a>
+</section>
+
+<section class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th class="col-province">省份</th>
+        <th>商场</th>
+        <th>原等级</th>
+        <th>人工等级</th>
+        <th>候选 POI</th>
+        <th>坐标证据</th>
+        <th>复核原因</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.mall_id }}</td>
+        <td class="col-province">{{ row.province }}</td>
+        <td>{{ row.name }}</td>
+        <td><span class="badge">{{ row.confidence_level }}</span></td>
+        <td>{% if row.decision_level %}<span class="badge level-{{ row.decision_level }}">{{ row.decision_level }}</span>{% elif row.previous_decision_level %}<span class="badge level-{{ row.previous_decision_level }}">{{ row.previous_decision_level }}</span>{% else %}-{% endif %}</td>
+        <td>{{ row.selected_poi_name }}</td>
+        <td>{{ row.official_coord_evidence }}</td>
+        <td>{{ row.suspicious_reason }}</td>
+        <td><a class="button small" href="/review/{{ row.mall_id }}{% if province_filter %}?province={{ province_filter }}{% endif %}">复核</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

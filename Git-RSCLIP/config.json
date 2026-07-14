@@ -1,0 +1,16 @@
+{
+  "_name_or_path": "/mnt/dataset/liuchenyang/huggingface/hub/models--google--siglip-base-patch16-224/snapshots/7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+  "architectures": [
+    "SiglipModel"
+  ],
+  "initializer_factor": 1.0,
+  "model_type": "siglip",
+  "text_config": {
+    "model_type": "siglip_text_model"
+  },
+  "torch_dtype": "float16",
+  "transformers_version": "4.46.0",
+  "vision_config": {
+    "model_type": "siglip_vision_model"
+  }
+}
