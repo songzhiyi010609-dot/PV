@@ -1,0 +1,2 @@
+﻿mall_id,name,confidence_level,center_lon,center_lat,center_source,reviewer,reason,final_polygon_geojson,reviewed_at,selected_provider,selected_poi_name,official_coord_evidence
+36,上海南翔印象城MEGA,A,121.30116565,31.30695218,official_poi_auto,,,,,tencent,上海南翔印象城MEGA,multi_provider_agree

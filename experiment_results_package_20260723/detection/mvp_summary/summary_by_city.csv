@@ -1,0 +1,6 @@
+﻿province,city,mall_count,suspected_pv_count,avg_confidence,coverage_rate,coverage_rate_pct
+上海,上海,1,1,0.95,1.0,100.0
+广东,深圳,1,1,0.95,1.0,100.0
+浙江,杭州,1,1,0.95,1.0,100.0
+四川,成都,1,0,0.2,0.0,0.0
+江苏,苏州,1,0,0.2,0.0,0.0

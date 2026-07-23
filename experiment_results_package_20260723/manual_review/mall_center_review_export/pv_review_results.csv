@@ -1,0 +1,1 @@
+﻿mall_id,name,province,city,center_lon,center_lat,poi_reviewer,poi_reviewed_at,pv_run_id,image_status,pv_status,pv_confidence,pv_area_m2_est,roof_candidate_count,roof_area_m2_est,install_condition_level,reviewer,decision,corrected_pv_status,surrounding_1km_install_condition,corrected_potential_level,reason,notes,reviewed_at

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商场光伏 MVP 复核页</title>
+  <style>
+    body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; background: #f6f7f8; color: #1f2933; }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    h1 { font-size: 24px; margin: 0 0 8px; }
+    .lead { margin: 0 0 24px; color: #52606d; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
+    .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06); }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    h2 { font-size: 16px; margin: 0; }
+    .badge { font-size: 12px; color: #fff; border-radius: 999px; padding: 4px 8px; white-space: nowrap; }
+    .yes { background: #0f766e; }
+    .no { background: #64748b; }
+    .meta { font-size: 13px; color: #52606d; margin: 8px 0 12px; }
+    .imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    figure { margin: 0; }
+    img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border: 1px solid #d9e2ec; border-radius: 6px; background: #e5e7eb; }
+    figcaption { font-size: 12px; color: #616e7c; margin-top: 4px; }
+    .reason { font-size: 12px; color: #3e4c59; margin: 10px 0 0; line-height: 1.45; }
+    @media (max-width: 520px) {
+      main { padding: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .imgs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>商场光伏 MVP 复核页</h1>
+    <p class="lead">红色叠加区域是 MVP 初筛出的疑似光伏。这个页面用于人工复核，不代表最终生产模型结果。</p>
+    <section class="grid">
+      
+            <article class="card">
+              <header>
+                <h2>示例商场A</h2>
+                <span class="badge yes">suspected PV</span>
+              </header>
+              <p class="meta">上海 / 上海 · confidence 0.95 · coverage 6.35%</p>
+              <div class="imgs">
+                <figure>
+                  <img src="../data/images/mall_001.png" alt="source image">
+                  <figcaption>source</figcaption>
+                </figure>
+                <figure>
+                  <img src="overlays/mall_001_overlay.png" alt="overlay image">
+                  <figcaption>overlay</figcaption>
+                </figure>
+              </div>
+              <p class="reason">pv_pixels=16652; coverage=6.3522%; components=1; decision=suspected_pv</p>
+            </article>
+            
+            <article class="card">
+              <header>
+                <h2>示例商场C</h2>
+                <span class="badge yes">suspected PV</span>
+              </header>
+              <p class="meta">广东 / 深圳 · confidence 0.95 · coverage 2.98%</p>
+              <div class="imgs">
+                <figure>
+                  <img src="../data/images/mall_003.png" alt="source image">
+                  <figcaption>source</figcaption>
+                </figure>
+                <figure>
+                  <img src="overlays/mall_003_overlay.png" alt="overlay image">
+                  <figcaption>overlay</figcaption>
+                </figure>
+              </div>
+              <p class="reason">pv_pixels=7800; coverage=2.9755%; components=1; decision=suspected_pv</p>
+            </article>
+            
+            <article class="card">
+              <header>
+                <h2>示例商场E</h2>
+                <span class="badge yes">suspected PV</span>
+              </header>
+              <p class="meta">浙江 / 杭州 · confidence 0.95 · coverage 2.13%</p>
+              <div class="imgs">
+                <figure>
+                  <img src="../data/images/mall_005.png" alt="source image">
+                  <figcaption>source</figcaption>
+                </figure>
+                <figure>
+                  <img src="overlays/mall_005_overlay.png" alt="overlay image">
+                  <figcaption>overlay</figcaption>
+                </figure>
+              </div>
+              <p class="reason">pv_pixels=5576; coverage=2.1271%; components=1; decision=suspected_pv</p>
+            </article>
+            
+            <article class="card">
+              <header>
+                <h2>示例商场B</h2>
+                <span class="badge no">not detected</span>
+              </header>
+              <p class="meta">江苏 / 苏州 · confidence 0.20 · coverage 0.00%</p>
+              <div class="imgs">
+                <figure>
+                  <img src="../data/images/mall_002.png" alt="source image">
+                  <figcaption>source</figcaption>
+                </figure>
+                <figure>
+                  <img src="overlays/mall_002_overlay.png" alt="overlay image">
+                  <figcaption>overlay</figcaption>
+                </figure>
+              </div>
+              <p class="reason">pv_pixels=0; coverage=0.0000%; components=0; decision=no_pv_or_below_threshold</p>
+            </article>
+            
+            <article class="card">
+              <header>
+                <h2>示例商场D</h2>
+                <span class="badge no">not detected</span>
+              </header>
+              <p class="meta">四川 / 成都 · confidence 0.20 · coverage 0.00%</p>
+              <div class="imgs">
+                <figure>
+                  <img src="../data/images/mall_004.png" alt="source image">
+                  <figcaption>source</figcaption>
+                </figure>
+                <figure>
+                  <img src="overlays/mall_004_overlay.png" alt="overlay image">
+                  <figcaption>overlay</figcaption>
+                </figure>
+              </div>
+              <p class="reason">pv_pixels=0; coverage=0.0000%; components=0; decision=no_pv_or_below_threshold</p>
+            </article>
+            
+    </section>
+  </main>
+</body>
+</html>
